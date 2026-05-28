@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design tokens — "Quiet Editorial" theme.
+   Warm cream background, serif display font, deep coral accent.
+   Optimized for screenshot-worthiness and emotional warmth.
+   ============================================================ */
+@theme {
+  --color-cream: #FAF7F2;
+  --color-paper: #FFFFFF;
+  --color-ink: #1A1714;
+  --color-ink-soft: #5C5852;
+  --color-ink-fade: #A8A29A;
+  --color-line: #EBE5DC;
+  --color-line-strong: #D9D2C5;
+  --color-accent: #BD3B0F;
+  --color-accent-soft: #F4E5DD;
+  --color-ok: #2D5A3D;
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+}
+
+html, body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* Subtle paper texture on the cream background — barely perceptible
+   but makes screenshots feel less flat. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(189, 59, 15, 0.025) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(45, 90, 61, 0.02) 0%, transparent 40%);
+}
+
+/* Display font helper class */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+/* Smooth selection */
+::selection {
+  background: var(--color-accent);
+  color: white;
+}
+
+/* Custom scrollbar (subtle) */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-ink-fade); }
