@@ -2,28 +2,72 @@
 
 An AI dating coach for guys who struggle with conversations on dating apps. Two surfaces:
 
-- **Text Coach** — paste a stalled chat or describe a situation, get coaching in natural language. Powered by Claude Sonnet 4.6 with a custom "elder brother" system prompt.
-- **Voice Practice** — a live voice call with "Sarah," an AI playing the role of a first match. Practice talking out loud. After the call, the coach reviews the transcript and gives feedback.
+- **Text Coach** — paste a stalled chat or describe a situation. Get coaching in natural language.
+- **Voice Practice** — a live voice call with "Sarah," an AI playing a first match. Practice talking out loud. After the call, the coach reviews the transcript.
+
+## Architecture
+
+Hybrid:
+
+```
+   ┌─────────────────────┐
+   │  Next.js frontend   │   React + Tailwind, editorial design
+   │  (TypeScript)       │
+   └──────────┬──────────┘
+              │ fetch + Vapi browser SDK
+   ┌──────────▼──────────┐
+   │  FastAPI backend    │   ← the "AI engineer" surface
+   │  (Python)           │
+   └──┬──────┬──────────┬┘
+      │      │          │
+  Claude  Supabase   Vapi (voice)
+```
+
+The frontend stays Next.js (React + Tailwind, fast UI iteration). The
+backend is FastAPI (Python) — calls Claude, persists to Supabase, enforces
+rate limits, generates post-call feedback. Vapi runs in the browser via
+its JS SDK.
 
 ## Stack
 
-- **Next.js 16** (App Router) + Tailwind + TypeScript
-- **Anthropic Claude** for all reasoning (coach + persona + post-call review)
-- **Vapi** for real-time voice (STT, TTS, turn-taking)
-- **Supabase** for session persistence (no auth — sessions scoped to a per-browser token)
-- **Vercel** for hosting
+| Layer       | Tech                                  |
+|-------------|---------------------------------------|
+| Frontend    | Next.js 16 (App Router) + Tailwind v4 |
+| Backend     | FastAPI + Python 3.11+                |
+| LLM         | Claude Sonnet 4.6 (Anthropic SDK)     |
+| Database    | Supabase (Postgres + JSONB)           |
+| Voice       | Vapi (browser SDK)                    |
+| Hosting     | Vercel (frontend) + Render/Railway (backend) — recommended |
 
 ## Run locally
 
+You need **two** terminals running.
+
+### 1. Backend
+
 ```bash
-cp .env.example .env.local   # fill in your keys
+cd backend
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env                # fill in keys
+uvicorn main:app --reload --port 8000
+```
+
+Backend at http://localhost:8000
+
+### 2. Frontend
+
+```bash
+# From project root
+cp .env.example .env.local          # set NEXT_PUBLIC_API_BASE=http://localhost:8000
 npm install
 npm run dev
 ```
 
-You'll need keys from: console.anthropic.com, supabase.com, vapi.ai.
+Frontend at http://localhost:3000
 
-## Schema (Supabase)
+## Database schema (Supabase)
 
 ```sql
 create table sessions (
@@ -37,6 +81,28 @@ create table sessions (
 create index sessions_user_token_idx on sessions (user_token);
 ```
 
-## Day 1 build
+## Project layout
 
-Built start-to-finish in one day as a build-in-public project. See `/app/api/coach/route.ts` for the system prompt — that's where most of the product lives.
+```
+.
+├── app/                    # Next.js frontend (React)
+│   ├── coach/              #   The text coach UI
+│   ├── practice/           #   The voice practice UI
+│   └── sessions/           #   Past sessions list
+├── lib/api.ts              # Helper: points frontend at backend URL
+├── backend/                # Python FastAPI backend
+│   ├── main.py             #   App entry + CORS
+│   ├── lib/                #   Supabase, rate-limit, prompts
+│   └── routes/             #   coach, sessions, voice
+├── PROJECT_MEMORY.md       # Build journal (paste into LLMs for posts)
+└── linkedin_carousel.html  # 7-slide LinkedIn carousel
+```
+
+## Build journal
+
+Built Day 1 as a TypeScript-only Next.js app (Anthropic SDK in API routes).
+Day 2: pivoted to a hybrid architecture — moved the AI logic to a Python
+FastAPI backend to better reflect the day-to-day AI engineering toolchain
+(Python is the lingua franca there). The frontend stayed React.
+
+See `PROJECT_MEMORY.md` for full detail.

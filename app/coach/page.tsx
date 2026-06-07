@@ -1,8 +1,10 @@
 // app/coach/page.tsx — Editorial chat UI
+// (Frontend only — calls the Python FastAPI backend via apiUrl)
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { apiUrl } from "@/lib/api";
 
 type Message = { role: "user" | "assistant"; content: string };
 const TOKEN_KEY = "dating_coach_user_token";
@@ -49,16 +51,16 @@ export default function CoachPage() {
     setLimitMsg(null);
 
     try {
-      const res = await fetch("/api/coach", {
+      // Talks to the Python FastAPI backend.
+      const res = await fetch(apiUrl("/api/coach"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: nextMessages, userToken, sessionId }),
       });
 
-      // Handle rate limit cleanly.
       if (res.status === 429) {
         const data = await res.json().catch(() => ({}));
-        setMessages((prev) => prev.slice(0, -1)); // drop the empty assistant bubble
+        setMessages((prev) => prev.slice(0, -1));
         setLimitMsg(data.message || "Daily limit reached. Try again tomorrow.");
         setStreaming(false);
         return;
@@ -96,7 +98,6 @@ export default function CoachPage() {
 
   return (
     <div className="min-h-screen bg-cream text-ink flex flex-col">
-      {/* HEADER */}
       <header className="px-6 md:px-10 py-5 border-b border-line">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link
@@ -115,19 +116,13 @@ export default function CoachPage() {
         </div>
       </header>
 
-      {/* TITLE */}
       <div className="px-6 md:px-10 pt-10 pb-6">
         <div className="max-w-3xl mx-auto">
-          <p className="text-[10px] tracking-[0.25em] uppercase text-ink-fade mb-2">
-            The Chat
-          </p>
-          <h1 className="font-display text-4xl md:text-5xl">
-            What&apos;s on your mind?
-          </h1>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-ink-fade mb-2">The Chat</p>
+          <h1 className="font-display text-4xl md:text-5xl">What&apos;s on your mind?</h1>
         </div>
       </div>
 
-      {/* MESSAGES */}
       <main className="flex-1 px-6 md:px-10 pb-6">
         <div className="max-w-3xl mx-auto">
           {messages.length === 0 && !limitMsg && (
@@ -139,9 +134,7 @@ export default function CoachPage() {
 
           {limitMsg && (
             <div className="my-8 border border-accent/30 bg-accent-soft rounded-2xl p-5">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-accent mb-2">
-                Daily limit
-              </div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-accent mb-2">Daily limit</div>
               <div className="text-ink text-[15px]">{limitMsg}</div>
             </div>
           )}
@@ -160,7 +153,6 @@ export default function CoachPage() {
         </div>
       </main>
 
-      {/* COMPOSER */}
       <footer className="px-6 md:px-10 py-5 border-t border-line bg-paper">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-end gap-3 bg-cream border border-line-strong rounded-2xl p-2 focus-within:border-ink/40 transition">
@@ -198,14 +190,8 @@ export default function CoachPage() {
 }
 
 function Bubble({
-  role,
-  content,
-  isStreaming,
-}: {
-  role: "user" | "assistant";
-  content: string;
-  isStreaming: boolean;
-}) {
+  role, content, isStreaming,
+}: { role: "user" | "assistant"; content: string; isStreaming: boolean }) {
   if (role === "user") {
     return (
       <div className="flex justify-end">
@@ -217,13 +203,9 @@ function Bubble({
   }
   return (
     <div className="max-w-[95%]">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-ink-fade mb-2">
-        Coach
-      </div>
+      <div className="text-[10px] uppercase tracking-[0.2em] text-ink-fade mb-2">Coach</div>
       <div className="text-ink text-[15px] leading-[1.7] whitespace-pre-wrap">
-        {content || (
-          <span className="text-ink-fade italic">listening…</span>
-        )}
+        {content || <span className="text-ink-fade italic">listening…</span>}
         {isStreaming && content && (
           <span className="inline-block w-2 h-4 ml-1 bg-accent align-text-bottom animate-pulse" />
         )}

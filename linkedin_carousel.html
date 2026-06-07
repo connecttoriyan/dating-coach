@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Dating Coach — LinkedIn Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --cream: #FAF7F2;
+    --paper: #FFFFFF;
+    --ink: #1A1714;
+    --ink-soft: #5C5852;
+    --ink-fade: #A8A29A;
+    --line: #EBE5DC;
+    --line-strong: #D9D2C5;
+    --accent: #BD3B0F;
+    --accent-soft: #F4E5DD;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #2B2825;
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  .toolbar {
+    max-width: 1080px;
+    margin: 0 auto 32px;
+    text-align: center;
+    color: #FAF7F2;
+    font-size: 14px;
+  }
+  .toolbar h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  .toolbar p { color: #B8B0A4; }
+  .toolbar .download-all {
+    display: inline-block;
+    margin-top: 16px;
+    background: var(--accent);
+    color: #FAF7F2;
+    border: 0;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .toolbar .download-all:hover { background: #FAF7F2; color: var(--ink); }
+
+  .slide-wrap {
+    max-width: 1080px;
+    margin: 0 auto 48px;
+    position: relative;
+  }
+  .slide-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #FAF7F2;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .slide-actions button {
+    background: transparent;
+    color: #FAF7F2;
+    border: 1px solid rgba(250,247,242,0.3);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .slide-actions button:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .slide {
+    width: 1080px;
+    height: 1080px;
+    background: var(--cream);
+    padding: 90px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.3);
+  }
+
+  /* Common slide elements */
+  .eyebrow {
+    font-size: 14px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .eyebrow-soft {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-fade);
+    font-weight: 500;
+  }
+  .slide-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-fade);
+  }
+  .slide-footer .brand {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .display {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  .italic-accent { font-style: italic; color: var(--accent); }
+  .body-text {
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 760px;
+  }
+
+  /* SLIDE 1 — Hook */
+  .s1 .display { font-size: 108px; max-width: 880px; margin-top: 60px; }
+
+  /* SLIDE 2 — Reframe */
+  .s2 .display { font-size: 108px; max-width: 880px; margin-top: 60px; }
+  .s2 .kicker { margin-top: 60px; font-size: 22px; color: var(--ink-soft); max-width: 600px; line-height: 1.5; }
+
+  /* SLIDE 3 — Problem */
+  .s3 .display { font-size: 72px; margin-top: 48px; max-width: 880px; }
+  .s3 .body-text { margin-top: 40px; font-size: 24px; line-height: 1.6; }
+
+  /* SLIDE 4 — Product intro */
+  .s4 { justify-content: center; align-items: flex-start; padding-top: 90px; }
+  .s4 .product-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 168px;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-top: 24px;
+  }
+  .s4 .product-sub {
+    margin-top: 24px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 36px;
+    color: var(--ink-soft);
+  }
+  .s4 .mockup {
+    margin-top: 80px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px 32px;
+    max-width: 620px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+  }
+  .s4 .mockup .label {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-fade);
+    margin-bottom: 14px;
+  }
+  .s4 .mockup .msg {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .s4 .mockup .msg em { color: var(--accent); font-style: italic; }
+
+  /* SLIDE 5 — Features */
+  .s5 .heading { font-size: 76px; margin-top: 40px; max-width: 700px; font-family: 'Instrument Serif', serif; line-height: 1.05; }
+  .s5 .features { margin-top: 70px; display: flex; flex-direction: column; gap: 36px; }
+  .s5 .feature { display: flex; gap: 32px; align-items: flex-start; }
+  .s5 .feature .num {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 56px;
+    color: var(--accent);
+    min-width: 90px;
+    line-height: 1;
+  }
+  .s5 .feature .label {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-fade);
+    margin-bottom: 8px;
+  }
+  .s5 .feature .title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .s5 .feature .desc {
+    font-size: 19px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  /* SLIDE 6 — Tech stack */
+  .s6 .heading { font-family: 'Instrument Serif', serif; font-size: 72px; margin-top: 40px; line-height: 1.05; max-width: 800px; }
+  .s6 .stack { margin-top: 80px; display: flex; flex-direction: column; }
+  .s6 .stack-row {
+    display: grid;
+    grid-template-columns: 360px 60px 1fr;
+    align-items: center;
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+    gap: 24px;
+  }
+  .s6 .stack-row:last-child { border-bottom: 1px solid var(--line); }
+  .s6 .stack-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 44px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .s6 .stack-arrow {
+    color: var(--accent);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 28px;
+  }
+  .s6 .stack-role {
+    font-size: 20px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  /* SLIDE 7 — Takeaway */
+  .s7 { justify-content: space-between; padding-top: 90px; padding-bottom: 90px; }
+  .s7 .quote {
+    font-family: 'Instrument Serif', serif;
+    font-size: 82px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-top: 50px;
+    max-width: 880px;
+  }
+  .s7 .author {
+    margin-top: 40px;
+    font-size: 18px;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+  }
+  .s7 .cta-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .s7 .cta-block .link {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    font-weight: 500;
+  }
+  .s7 .cta-block .sig {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Dating Coach — LinkedIn Carousel</h1>
+  <p>7 slides, 1080 × 1080. Click "Download PNG" on each, or grab them all at once.</p>
+  <button class="download-all" onclick="downloadAll()">Download all 7 as PNG</button>
+</div>
+
+<!-- ============== SLIDE 1 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 1 / 7 — Hook</span>
+    <button onclick="downloadSlide(1)">Download PNG</button>
+  </div>
+  <div class="slide s1" id="slide-1">
+    <div class="eyebrow">01 / 07</div>
+    <div class="display">
+      Most dating advice<br/>teaches you<br/><span class="italic-accent">what to send.</span>
+    </div>
+    <div class="slide-footer">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 2 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 2 / 7 — Reframe</span>
+    <button onclick="downloadSlide(2)">Download PNG</button>
+  </div>
+  <div class="slide s2" id="slide-2">
+    <div class="eyebrow">02 / 07</div>
+    <div class="display">
+      I wanted to build<br/>something that<br/>teaches you <span class="italic-accent">what<br/>to notice.</span>
+    </div>
+    <div class="kicker">An AI coach for the silent moments in a conversation — the ones most people miss.</div>
+    <div class="slide-footer">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 3 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 3 / 7 — The problem</span>
+    <button onclick="downloadSlide(3)">Download PNG</button>
+  </div>
+  <div class="slide s3" id="slide-3">
+    <div class="eyebrow-soft">03 / The problem</div>
+    <div class="display">
+      Conversations don't die<br/>from <span class="italic-accent">bad lines.</span>
+    </div>
+    <div class="body-text">
+      They die from missed signals. A short reply. A topic that didn't land. A moment that needed matching. Most guys see the message and panic, send something safe, and watch the thread cool.
+      <br/><br/>
+      The thing they needed wasn't a better opener. It was someone to point out what just happened.
+    </div>
+    <div class="slide-footer">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 4 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 4 / 7 — The product</span>
+    <button onclick="downloadSlide(4)">Download PNG</button>
+  </div>
+  <div class="slide s4" id="slide-4">
+    <div class="eyebrow-soft">04 / The product</div>
+    <div class="product-title">Dating<br/>Coach.</div>
+    <div class="product-sub">An AI that reads the room with you.</div>
+    <div class="mockup">
+      <div class="label">The Coach · Reply</div>
+      <div class="msg">
+        Alright — that "haha thanks" with no question back? <em>That's her politely declining to invest.</em> Don't panic. The thread isn't dead, just cold. Try a low-pressure reset — something that doesn't ask anything of her but opens a door…
+      </div>
+    </div>
+    <div class="slide-footer" style="margin-top: 60px;">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 5 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 5 / 7 — Features</span>
+    <button onclick="downloadSlide(5)">Download PNG</button>
+  </div>
+  <div class="slide s5" id="slide-5">
+    <div class="eyebrow-soft">05 / Three surfaces</div>
+    <div class="heading">What it<br/>actually does.</div>
+    <div class="features">
+      <div class="feature">
+        <div class="num">01</div>
+        <div>
+          <div class="label">The Chat</div>
+          <div class="title">Paste a stalled conversation.</div>
+          <div class="desc">Get the read on what she's actually signaling — not just a one-liner to copy.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="num">02</div>
+        <div>
+          <div class="label">The Call</div>
+          <div class="title">Practice out loud.</div>
+          <div class="desc">A real voice call with an AI date. Get used to thinking on your feet, in real time.</div>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="num">03</div>
+        <div>
+          <div class="label">The Replay</div>
+          <div class="title">See what you're repeating.</div>
+          <div class="desc">Every session saved. Every pattern surfaced. Spot what keeps killing your matches.</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 6 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 6 / 7 — Tech stack</span>
+    <button onclick="downloadSlide(6)">Download PNG</button>
+  </div>
+  <div class="slide s6" id="slide-6">
+    <div class="eyebrow-soft">06 / Under the hood</div>
+    <div class="heading">The whole thing,<br/>in four layers.</div>
+    <div class="stack">
+      <div class="stack-row">
+        <div class="stack-name">Claude Sonnet 4.6</div>
+        <div class="stack-arrow">→</div>
+        <div class="stack-role">The brain. Coach voice, date persona, post-call review.</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Vapi</div>
+        <div class="stack-arrow">→</div>
+        <div class="stack-role">Real-time voice. STT + TTS + turn-taking, in one SDK.</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Supabase</div>
+        <div class="stack-arrow">→</div>
+        <div class="stack-role">Session memory. One Postgres table, JSONB transcripts.</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Next.js · Vercel</div>
+        <div class="stack-arrow">→</div>
+        <div class="stack-role">The surface. App Router, streaming responses, edge-friendly.</div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Day 1 · Build in public</span>
+      <span class="brand">Dating Coach</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== SLIDE 7 ============== -->
+<div class="slide-wrap">
+  <div class="slide-actions">
+    <span>Slide 7 / 7 — Takeaway</span>
+    <button onclick="downloadSlide(7)">Download PNG</button>
+  </div>
+  <div class="slide s7" id="slide-7">
+    <div>
+      <div class="eyebrow-soft">07 / What I learned</div>
+      <div class="quote">
+        The hardest part<br/>wasn't the code.<br/>It was teaching the<br/>AI <span class="italic-accent">not to sound<br/>like AI.</span>
+      </div>
+      <div class="author">Three prompt rewrites before it landed.</div>
+    </div>
+    <div class="cta-block">
+      <div class="link">→ github.com/connecttoriyan/dating-coach</div>
+      <div class="sig">— Riyan, Day 1</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function downloadSlide(n) {
+    const el = document.getElementById('slide-' + n);
+    const canvas = await html2canvas(el, {
+      width: 1080,
+      height: 1080,
+      scale: 2,                // export at 2x for crisp LinkedIn quality
+      backgroundColor: '#FAF7F2',
+      useCORS: true,
+      allowTaint: true,
+    });
+    const link = document.createElement('a');
+    link.download = 'dating-coach-slide-' + n + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+  async function downloadAll() {
+    for (let i = 1; i <= 7; i++) {
+      await downloadSlide(i);
+      await new Promise(r => setTimeout(r, 400));
+    }
+  }
+</script>
+</body>
+</html>
